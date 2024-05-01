@@ -61,6 +61,32 @@ router.post("/add-entry", async (req, res) => {
   }
 });
 
+// count students
+
+router.post("/activeStudentsCount", async (req, res) => {
+  try {
+    const { labCode } = req.body;
+
+    if (!labCode) {
+      return res.status(400).json({
+        success: false,
+        message: "Lab code is required",
+      });
+    }
+
+    const activeStudentsCount = await LabEntry.countDocuments({
+      labCode: labCode,
+      isActive: true,
+    });
+
+    res.status(200).json({ success: true, activeStudentsCount });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+});
+
 router.put("/lab-leave", async (req, res) => {
   const { grNumber } = req.body;
 
