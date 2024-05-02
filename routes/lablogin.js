@@ -56,7 +56,6 @@ router.post(
 router.post(
   "/verify",
   [
-    // Validate request body
     body("adminId").notEmpty().withMessage("Admin ID is required"),
     body("password").notEmpty().withMessage("Password is required"),
   ],
@@ -66,35 +65,29 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
     }
 
-    // Destructure request body
     const { adminId, password, labNumber } = req.body;
 
     try {
-      // Find lab login data by adminId
       const labLogin = await LabLogin.findOne({ adminId });
 
-      // Check if lab login data exists
       if (!labLogin) {
         return res.status(404).json({ message: "Lab login not found" });
       }
 
-      // Compare passwords
       const passwordMatch = await bcrypt.compare(password, labLogin.password);
 
       if (passwordMatch) {
-        // Passwords match, login is verified
         return res
           .status(200)
           .json({ success: true, message: "Login verified" });
       } else {
-        // Passwords don't match, login is not verified
         return res
           .status(401)
           .json({ success: false, message: "Invalid credentials" });
       }
     } catch (error) {
       console.error(error);
-      // Send error response
+
       res
         .status(500)
         .json({ success: false, message: "Internal Server Error" });

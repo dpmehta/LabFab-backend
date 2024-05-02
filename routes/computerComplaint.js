@@ -74,4 +74,39 @@ router.get("/computer-complaint", async (req, res) => {
   }
 });
 
+router.put("/updateStatus", async (req, res) => {
+  try {
+    const { id, status } = req.body;
+
+    if (!id || !status) {
+      return res.status(400).json({
+        success: false,
+        message: "ID and status are required",
+      });
+    }
+
+    const updatedComplaint = await ComputerComplaint.findByIdAndUpdate(
+      id,
+      { $set: { status } },
+      { new: true }
+    );
+
+    if (!updatedComplaint) {
+      return res.status(404).json({
+        success: false,
+        message: "Complaint not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Complaint status updated successfully",
+      updatedComplaint,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+});
+
 module.exports = router;
