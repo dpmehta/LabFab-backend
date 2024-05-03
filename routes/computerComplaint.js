@@ -109,4 +109,35 @@ router.put("/updateStatus", async (req, res) => {
   }
 });
 
+router.post("/getStudentComplaint", async (req, res) => {
+  try {
+    const { grNumber } = req.body;
+
+    const student = await Student.findOne({ grNumber });
+
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    const studentComplaints = await ComputerComplaint.find({
+      studentToken: student._id,
+    })
+      .populate("studentToken", "student_name grNumber")
+      .exec();
+
+    if (!studentComplaints || studentComplaints.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No complaints found for the student",
+      });
+    }
+
+    res.status(200).json({ success: true, studentComplaints });
+  } catch (error) {
+    console.error(error);
+    // Send error response
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+});
+
 module.exports = router;

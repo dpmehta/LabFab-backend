@@ -62,7 +62,6 @@ router.post(
 
 router.get("/component-complaint", async (req, res) => {
   try {
-    // Find all component issue requests
     const componentComplaints = await Complaint.find({})
       .populate("studentToken", "student_name grNumber")
       .exec();
@@ -75,6 +74,37 @@ router.get("/component-complaint", async (req, res) => {
 
     // Send success response with the component issue requests
     res.status(200).json({ success: true, componentComplaints });
+  } catch (error) {
+    console.error(error);
+    // Send error response
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+});
+
+router.post("/getStudentComplaint", async (req, res) => {
+  try {
+    const { grNumber } = req.body;
+
+    const student = await Student.findOne({ grNumber });
+
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    const studentComplaints = await Complaint.find({
+      studentToken: student._id,
+    })
+      .populate("studentToken", "student_name grNumber")
+      .exec();
+
+    if (!studentComplaints || studentComplaints.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No complaints found for the student",
+      });
+    }
+
+    res.status(200).json({ success: true, studentComplaints });
   } catch (error) {
     console.error(error);
     // Send error response
