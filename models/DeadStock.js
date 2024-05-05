@@ -52,6 +52,10 @@ const deadStockSchema = new mongoose.Schema({
     required: true,
     default: Date.now,
   },
+  remark: {
+    type: String,
+    default: "",
+  },
 });
 
 const DeadStock = mongoose.model("DeadStock", deadStockSchema);

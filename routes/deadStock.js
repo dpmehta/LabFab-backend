@@ -122,6 +122,33 @@ router.delete("/delete/:id", async (req, res) => {
   }
 });
 
+router.put("/updateStatus", async (req, res) => {
+  const { id } = req.body;
+  const { status } = req.body;
+
+  try {
+    // Find the component issue by ID
+    const deadStockEntry = await DeadStock.findById(id);
+
+    if (!deadStockEntry) {
+      return res.status(404).json({
+        message: "entry not found",
+      });
+    }
+
+    // Update the status
+    deadStockEntry.status = status;
+    await deadStockEntry.save();
+
+    // Send success response
+    res.status(200).json({ success: true, deadStockEntry });
+  } catch (error) {
+    console.error(error);
+    // Send error response
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+});
+
 function validateDeadStock(deadStock) {
   const schema = Joi.object({
     deadStockNumber: Joi.string().required(),
