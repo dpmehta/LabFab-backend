@@ -5,7 +5,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const router = express.Router();
 
-const jwtSecret = process.env.JWT_SECRET;
+const jwtSecret = "MYJWTSECRETKEYTOAUTHENTICATEUSERBASEDONJWTTOKEN";
 
 // POST endpoint to add faculty data
 router.post(

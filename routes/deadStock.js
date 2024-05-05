@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const DeadStock = require("../models/DeadStock");
 const Joi = require("joi");
+const fetchuser = require("../middleware/fetchUser");
+const Faculty = require("../models/Faculty");
 
 // POST request to add a DeadStock entry
 router.post("/add", async (req, res) => {
@@ -23,8 +25,14 @@ router.post("/add", async (req, res) => {
       purchaseAmount,
       year,
       labNumber,
-      adminId,
+      email,
     } = req.body;
+
+    const faculty = await Faculty.findOne({ email });
+
+    if (!faculty) {
+      return res.status(404).json({ message: "Faculty not found" });
+    }
 
     // Create a new DeadStock entry
     const deadStockEntry = new DeadStock({
@@ -37,7 +45,7 @@ router.post("/add", async (req, res) => {
       purchaseAmount,
       year,
       labNumber,
-      adminId,
+      adminId: faculty._id,
     });
 
     // Save the DeadStock entry to the database
@@ -52,7 +60,21 @@ router.post("/add", async (req, res) => {
   }
 });
 
-router.get("/getAll", async (req, res) => {
+router.post("/filterByStatus", fetchuser, async (req, res) => {
+  try {
+    let filter = {};
+    if (req.body.status !== "All") {
+      filter = { status: req.body.status };
+    }
+    const entries = await DeadStock.find(filter).populate("adminId", "email");
+    res.json(entries);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+router.get("/getAll", fetchuser, async (req, res) => {
   try {
     const entries = await DeadStock.find();
 
@@ -111,7 +133,7 @@ function validateDeadStock(deadStock) {
     purchaseAmount: Joi.number().positive().required(),
     year: Joi.number().integer().positive().required(),
     labNumber: Joi.string().required(),
-    adminId: Joi.string().required(),
+    email: Joi.string().required(),
   });
   return schema.validate(deadStock);
 }

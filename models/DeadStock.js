@@ -38,8 +38,14 @@ const deadStockSchema = new mongoose.Schema({
     required: true,
   },
   adminId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Faculty", // Reference to the Student model
     required: true,
+  },
+  status: {
+    type: String,
+    enum: ["pending", "approved", "rejected"],
+    default: "pending",
   },
   createdDate: {
     type: Date,
