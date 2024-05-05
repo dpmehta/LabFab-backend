@@ -98,6 +98,8 @@ router.put("/update/:id", async (req, res) => {
       return res.status(404).json({ message: "Entry not found" });
     }
 
+    updatedEntry.status = "pending";
+
     res.status(200).json(updatedEntry);
   } catch (error) {
     console.error(error);
@@ -137,6 +139,34 @@ router.put("/updateStatus", async (req, res) => {
     }
 
     // Update the status
+    deadStockEntry.status = status;
+    await deadStockEntry.save();
+
+    // Send success response
+    res.status(200).json({ success: true, deadStockEntry });
+  } catch (error) {
+    console.error(error);
+    // Send error response
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+});
+
+router.put("/updateRemark", async (req, res) => {
+  const { id } = req.body;
+  const { remark, status } = req.body;
+
+  try {
+    // Find the component issue by ID
+    const deadStockEntry = await DeadStock.findById(id);
+
+    if (!deadStockEntry) {
+      return res.status(404).json({
+        message: "entry not found",
+      });
+    }
+
+    // Update the status
+    deadStockEntry.remark = remark;
     deadStockEntry.status = status;
     await deadStockEntry.save();
 

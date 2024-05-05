@@ -5,6 +5,7 @@ const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const JWT_SECRET = "myJwtSecret";
+const Student = require("../models/Student");
 
 router.post(
   "/signup",
@@ -31,6 +32,12 @@ router.post(
         return res
           .status(400)
           .json({ success, error: "User with this GR No already exists" });
+      }
+
+      const student = await Student.findOne({ grNumber });
+
+      if (!student) {
+        return res.status(404).json({ message: "Enter Valid GR Number" });
       }
 
       const salt = await bcrypt.genSalt(10);
