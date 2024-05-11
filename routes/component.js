@@ -12,7 +12,13 @@ router.post(
     body("componentName").notEmpty().withMessage("Component Name is required"),
     body("quantity")
       .isNumeric()
-      .withMessage("Quantity must be a numeric value"),
+      .withMessage("Quantity must be a numeric value")
+      .custom((value) => {
+        if (parseFloat(value) <= 0) {
+          throw new Error("Quantity must be greater than 0");
+        }
+        return true;
+      }),
     body("issueDate").isDate().withMessage("Invalid Issue Date"),
     body("returnDate").isDate().withMessage("Invalid Return Date"),
     body("purpose").notEmpty().withMessage("Purpose is required"),
@@ -70,10 +76,9 @@ router.post(
 
 // GET endpoint to fetch component issue requests by student token
 router.post("/component-issues", async (req, res) => {
-  const { grNumber} = req.body;
+  const { grNumber } = req.body;
 
   try {
-
     // Find the student based on grNumber
     const student = await Student.findOne({ grNumber });
 
@@ -82,16 +87,15 @@ router.post("/component-issues", async (req, res) => {
     }
 
     // Find component issues related to the studentToken (student's _id)
-    const componentIssues = await ComponentIssue.find({ studentToken: student._id });
+    const componentIssues = await ComponentIssue.find({
+      studentToken: student._id,
+    });
 
     // Send success response with the component issues related to the student
     res.status(200).json({
       success: true,
       componentIssues,
     });
-    
-
-  
   } catch (error) {
     console.error(error);
     // Send error response
