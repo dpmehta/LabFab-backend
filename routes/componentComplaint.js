@@ -32,7 +32,9 @@ router.post(
       } = req.body;
 
       // Get the file path from the request
-      const imageUpload = req.file ? req.file.path : "";
+      const imageUpload = req.file
+        ? `/assets/images/component-complaint-images/${req.file.filename}`
+        : "";
       const student = await Student.findOne({ grNumber });
 
       if (!student) {

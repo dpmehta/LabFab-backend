@@ -24,7 +24,9 @@ router.post(
     try {
       const { desktopId, issue, labLocation, grNumber, status } = req.body;
 
-      const imageUpload = req.file ? req.file.path : "";
+      const imageUpload = req.file
+        ? `/assets/images/computer-complaint-images/${req.file.filename}`
+        : "";
 
       const student = await Student.findOne({ grNumber });
 

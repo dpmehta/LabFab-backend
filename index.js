@@ -1,5 +1,6 @@
 const connectToMongo = require("./db");
 const express = require("express");
+const path = require("path");
 const app = express();
 const cors = require("cors");
 require("dotenv").config();
@@ -9,6 +10,10 @@ app.use(cors());
 app.use(express.json());
 
 connectToMongo();
+app.use(
+  "/assets/images",
+  express.static(path.join(__dirname, "assets/images"))
+);
 
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/component", require("./routes/component"));

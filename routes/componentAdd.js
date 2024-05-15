@@ -18,7 +18,9 @@ const upload = multer({ storage });
 router.post("/", upload.single("image"), async (req, res) => {
   try {
     const { name, description, location } = req.body;
-    const imageUpload = req.file ? req.file.path : "";
+    const imageUpload = req.file
+      ? `/assets/images/component-images/${req.file.filename}`
+      : "";
 
     const component = new Component({
       name,
