@@ -1,14 +1,12 @@
 const mongoose = require("mongoose");
-
-const mongoURI = "mongodb://127.0.0.1:27017/lab-portal";
+require("dotenv").config();
 
 const connectToMongo = () => {
   try {
-    mongoose.connect(mongoURI);
+    mongoose.connect(process.env.MONGO_URL);
     console.log("connected succesfully");
   } catch (error) {
     console.log(error);
   }
 };
-
-module.exports = connectToMongo;
+mongodb: module.exports = connectToMongo;
